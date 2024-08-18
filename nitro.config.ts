@@ -5,6 +5,9 @@ dotEnvConfig();
 export default defineNitroConfig({
   srcDir: "server",
   scanDirs: ["app"],
+  experimental: {
+    asyncContext: true,
+  },
   runtimeConfig: {
     app: {
       name: validEnv<string>("APP_NAME"),
