@@ -1,16 +1,16 @@
 import { config as dotEnvConfig } from "dotenv";
-import validEnv from "./server/app/utils/valid-env";
+import { useValidEnv } from "./server/app/utils/validator";
 
 dotEnvConfig();
 export default defineNitroConfig({
   srcDir: "server",
-  scanDirs: ["app"],
+  scanDirs: ["app", "auth"],
   experimental: {
     asyncContext: true,
   },
   runtimeConfig: {
     app: {
-      name: validEnv<string>("APP_NAME"),
+      name: useValidEnv<string>("APP_NAME"),
     },
   },
 });
