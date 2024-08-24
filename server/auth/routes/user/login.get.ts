@@ -1,7 +1,7 @@
+import { z } from "zod";
+
 export default eventHandler((event) =>
-  useSyncHandler({
-    fn: () => {
-      return useAuthContainer()
-    },
+  useAsyncHandler({
+    fn: () => "login",
   })
 );
