@@ -1,24 +1,61 @@
 import { z, ZodTypeAny } from "zod";
 import { H3Event } from "h3";
 
-function parse(schema: ZodTypeAny, data: any) {
+export function useValidator<T>(
+  schema: ZodTypeAny,
+  data: T,
+  catcher?: Function
+): T {
   const res = schema.safeParse(data);
-  return res.success
-    ? res.data
-    : useSendError({
-        data: res.error.flatten().fieldErrors,
-        httpStatus: "UNPROCESSABLE_ENTITY",
-      });
+  if (!res.success)
+    return catcher
+      ? catcher()
+      : useSendError({
+          data: res.error.flatten().fieldErrors,
+          httpStatus: "UNPROCESSABLE_ENTITY",
+        });
+
+  return res.data;
 }
 
-export function useValidator(event: H3Event = useEvent()) {
-  return {
-    parse,
-    reqBody: async (schema: ZodTypeAny) => parse(schema, await readBody(event)),
-    reqQuery: (schema: ZodTypeAny) => parse(schema, getQuery(event)),
-    routeParam: (schema: ZodTypeAny, name: string) =>
-      parse(schema, getRouterParam(event, name)),
-  };
+export async function useValidReqBody<T>(
+  schema: ZodTypeAny,
+  {
+    event = useEvent(),
+    catcher,
+  }: {
+    event?: H3Event;
+    catcher?: Function;
+  } = {}
+): Promise<T> {
+  return useValidator<T>(schema, await readBody<T>(event), catcher);
+}
+
+export function useValidReqQuery<T>(
+  schema: ZodTypeAny,
+  {
+    event = useEvent(),
+    catcher,
+  }: {
+    event?: H3Event;
+    catcher?: Function;
+  } = {}
+) {
+  return useValidator<T>(schema, getQuery(event), catcher);
+}
+
+export function useValidRouteParam(
+  schema: ZodTypeAny,
+  name: string,
+  {
+    event = useEvent(),
+    catcher,
+  }: {
+    event?: H3Event;
+    catcher?: Function;
+  } = {}
+) {
+  return useValidator<string>(schema, getRouterParam(event, name), catcher);
 }
 
 export function useValidEnv<T = string>(
