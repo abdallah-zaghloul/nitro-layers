@@ -1,7 +1,7 @@
 import { H3Event } from "h3";
 import { MimeType } from "h3";
 
-export const defaultErrorStatus = {
+export const DEFAULT_ERROR_STATUS = {
   UNPROCESSABLE_ENTITY: {
     statusCode: 422,
     statusMessage: "Unprocessable Entity",
@@ -20,7 +20,7 @@ export const defaultErrorStatus = {
   },
 };
 
-export const defaultResponseStatus = {
+export const DEFAULT_RESPONSE_STATUS = {
   SUCCESS: {
     statusCode: 200,
     statusMessage: "Success",
@@ -32,50 +32,59 @@ export const defaultResponseStatus = {
 };
 
 export function useSendError({
-  event = useEvent(),
-  data,
   httpStatus,
-}: {
-  event?: H3Event;
-  data?: any;
-  httpStatus: HttpErrorStatusName | HttpStatusObject;
-}) {
-  if (typeof httpStatus === "string")
-    httpStatus = defaultErrorStatus[httpStatus];
-
-  const error = createError({
-    statusCode: httpStatus.statusCode,
-    statusMessage: httpStatus.statusMessage,
-    data: data,
-  });
-
-  sendError(event, error);
-  throw error;
-}
-
-export function useSendResponse({
-  event = useEvent(),
   data,
-  httpStatus = "SUCCESS",
+  event = useEvent(),
   type = "application/json",
 }: {
+  httpStatus: HttpErrorStatusName | HttpStatusObject;
   event?: H3Event;
   data?: any;
-  httpStatus?: HttpResponseStatusName | HttpStatusObject;
   type?: MimeType;
 }) {
   if (typeof httpStatus === "string")
-    httpStatus = defaultResponseStatus[httpStatus];
+    httpStatus = DEFAULT_ERROR_STATUS[httpStatus];
 
-  return send(
+  event.node.res.statusCode = httpStatus.statusCode;
+  event.node.res.statusMessage = httpStatus.statusMessage;
+  event.node.res.setHeader("Content-Type", type);
+  type === "application/json"
+    ? event.node.res.end(JSON.stringify(data))
+    : event.node.res.end(data);
+
+  sendError(
     event,
-    {
+    createError({
       statusCode: httpStatus.statusCode,
       statusMessage: httpStatus.statusMessage,
-      data: data,
-    },
-    type
+      data,
+    })
   );
+
+  throw data;
+}
+
+export function useSendResponse({
+  httpStatus = "SUCCESS",
+  data,
+  event = useEvent(),
+  type = "application/json",
+}: {
+  httpStatus?: HttpResponseStatusName | HttpStatusObject;
+  data?: any;
+  event?: H3Event;
+  type?: MimeType;
+}) {
+  if (typeof httpStatus === "string")
+    httpStatus = DEFAULT_RESPONSE_STATUS[httpStatus];
+
+  event.node.res.statusCode = httpStatus.statusCode;
+  event.node.res.statusMessage = httpStatus.statusMessage;
+  event.node.res.setHeader("Content-Type", type);
+  send(event, data, type);
+  return type === "application/json"
+    ? event.node.res.end(JSON.stringify(data))
+    : event.node.res.end(data);
 }
 
 export function useSyncHandler({

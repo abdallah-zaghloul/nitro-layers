@@ -1,5 +1,6 @@
-type HttpErrorStatusName = keyof typeof defaultErrorStatus;
-type HttpResponseStatusName = keyof typeof defaultResponseStatus;
+
+type HttpErrorStatusName = keyof typeof DEFAULT_ERROR_STATUS;
+type HttpResponseStatusName = keyof typeof DEFAULT_RESPONSE_STATUS;
 type HttpStatusObject = { statusCode: number; statusMessage: string };
 type HttpStatus =
   | HttpErrorStatusName
