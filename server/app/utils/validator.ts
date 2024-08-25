@@ -58,6 +58,21 @@ export function useValidRouteParam(
   return useValidator<string>(schema, getRouterParam(event, name), catcher);
 }
 
+
+export function useValidHeader(
+  schema: ZodTypeAny,
+  name: string,
+  {
+    event = useEvent(),
+    catcher,
+  }: {
+    event?: H3Event;
+    catcher?: Function;
+  } = {}
+) {
+  return useValidator<string>(schema, getHeader(event, name), catcher);
+}
+
 export function useValidEnv<T = string>(
   name: string,
   value?: T,
