@@ -1,11 +1,6 @@
-
-type HttpErrorStatusName = keyof typeof DEFAULT_ERROR_STATUS;
-type HttpResponseStatusName = keyof typeof DEFAULT_RESPONSE_STATUS;
-type HttpStatusObject = { statusCode: number; statusMessage: string };
-type HttpStatus =
-  | HttpErrorStatusName
-  | HttpResponseStatusName
-  | HttpStatusObject;
+type HttpErrorStatus = keyof typeof DEFAULT_ERROR_STATUS;
+type HttpResponseStatus = keyof typeof DEFAULT_RESPONSE_STATUS;
+type HttpStatus = HttpErrorStatus | HttpResponseStatus;
 
 // Define a Container type with class constructors or instances
 type Container<T extends Record<string, new (...args: any[]) => any>> = {

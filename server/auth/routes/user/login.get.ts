@@ -1,7 +1,13 @@
-import { z } from "zod";
+import authRequest from "~/app/request/auth.request";
+import mobileResponse from "~/app/response/mobile.response";
 
-export default eventHandler((event) =>
-  useAsyncHandler({
-    fn: () => "login",
-  })
-);
+export default eventHandler({
+  onRequest: [authRequest],
+  handler: useHandler({
+    fn(event) {
+      console.log(event.context);
+      return "hello";
+    },
+  }),
+  onBeforeResponse: mobileResponse,
+});

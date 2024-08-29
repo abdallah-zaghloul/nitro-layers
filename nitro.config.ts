@@ -1,7 +1,5 @@
-import { config as dotEnvConfig } from "dotenv";
-import { useValidEnv } from "./server/app/utils/validator";
+import { env } from "./handler.config";
 
-dotEnvConfig();
 export default defineNitroConfig({
   srcDir: "server",
   scanDirs: ["app", "auth"],
@@ -10,7 +8,7 @@ export default defineNitroConfig({
   },
   runtimeConfig: {
     app: {
-      name: useValidEnv<string>("APP_NAME"),
+      name: env.valid("APP_NAME", "string"),
     },
   },
 });
