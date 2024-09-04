@@ -1,4 +1,4 @@
-import { z, ZodTypeAny } from "zod";
+import { ZodTypeAny } from "zod";
 import { H3Event } from "h3";
 
 export function useValidator<T>(
@@ -57,7 +57,6 @@ export function useValidRouteParam(
 ) {
   return useValidator<string>(schema, getRouterParam(event, name), catcher);
 }
-
 
 export function useValidHeader(
   schema: ZodTypeAny,
